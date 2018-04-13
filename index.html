@@ -2,14 +2,14 @@
 <html>
 <head>
     <title>Appsistencia</title>
-    <script src="vue.js"></script>
-    <link rel="stylesheet" href="bootstrap.min.css">
+    <script src="js/vue.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
 </head>
 <body>
 <div id="app">
     <div class="row">
         <div class="text-center">
-            <h1><img src="logo.png" class="img-circle" style="height: 70px; width: 70px;margin-right:10px;">Appsistencia</h1>
+            <h1><img src="css/logo.png" class="img-circle" style="height: 70px; width: 70px;margin-right:10px;">Appsistencia</h1>
         </div>
         <br>
     </div>
@@ -39,10 +39,10 @@
                     <label for="date_fecha">Fecha:</label>
                     <input type="date" id="date_fecha" class="form-control" v-model="fecha" required>
                     <label class="radio-inline">
-                        <input type="radio" name="radio_asistencia" id="presente" value="true" v-model="asistencia" required> Presente
+                        <input type="radio" name="radio_asistencia" id="presente" :value="true" v-model="asistencia" required> Presente
                     </label>
                     <label class="radio-inline">
-                        <input type="radio" name="radio_asistencia" id="ausente" value="false" v-model="asistencia" required> Ausente
+                        <input type="radio" name="radio_asistencia" id="ausente" :value="false" v-model="asistencia" required> Ausente
                     </label>
                 </div>
                     <button type="submit" class="btn btn-success">Guardar</button>
@@ -51,15 +51,6 @@
         </div>
         <div class="col-md-3"></div>
     </div>
-    <!--<div class="row">-->
-        <!--<div class="col-md-2" v-for="e in elegibles">-->
-            <!--<h3><p class="text-center">{{e}}<button type="button" class="close" aria-label="Close" @click="eliminar(e)"><span aria-hidden="true">&times;</span></button></p></h3>-->
-            <!--<button type="button" class="btn btn-success btn-block" @click="presi1(e)">Presi 1</button>-->
-            <!--<button type="button" class="btn btn-info btn-block" @click="presi2(e)">Presi 2</button>-->
-            <!--<button type="button" class="btn btn-warning btn-block" @click="comando(e)">Comando</button>-->
-        <!--</div>-->
-        <!--<hr>-->
-    <!--</div>-->
     <div class="row">
         <hr>
         <div class="col-md-2"></div>
@@ -82,8 +73,9 @@
         <div class="col-md-2"></div>
     </div>
 </div>
-
 <script>
+    const mlabKey = '-sMr1mNn6eSrK0UwllpPWyUqDc98Mq5O'
+    const collectionURL = 'https://api.mlab.com/api/1/databases/appsistencia/collections/personas?apiKey=' + mlabKey
     var app = new Vue({
         el: '#app',
         data: {
@@ -97,48 +89,26 @@
             this.loadPersonas()
         },
         methods: {
-            /*agregar: function (e) {
-                let pibe = this.input.nombre
-                this.elegibles.push(pibe)
-                this.input.nombre = null
-                let vot = {
-                    presi1: 0,
-                    presi2: 0,
-                    comando: 0
-                }
-                Vue.set(this.votos, pibe, vot)
-            },
-            presi1: function (e) {
-                this.votos[e]['presi1']++
-            },
-            presi2: function (e) {
-                this.votos[e]['presi2']++
-            },
-            comando: function (e) {
-                this.votos[e]['comando']++
-            },
-            eliminar: function (e) {
-                this.elegibles = this.elegibles.filter(function (ele) { return ele != e })
-                delete this.votos[e]
-            },*/
             loadPersonas: function () {
-                this.personas = []
-                this.loadJSON(r => {
-                    r = JSON.parse(r)
+                this.loadJSON()
+                    .then(r => {
                     this.personas = r
                 })
             },
-            loadJSON: function (callback) {
-                let xobj = new XMLHttpRequest()
-                xobj.overrideMimeType("application/json")
-                xobj.open('GET', 'asistencia.json', true)
-                xobj.onreadystatechange = function() {
-                    if (xobj.readyState == 4 && xobj.status == "200") {
-                        // .open will NOT return a value but simply returns undefined in async mode so use a callback
-                        callback(xobj.responseText)
-                    }
-                }
-                xobj.send(null)
+            loadJSON: function () {
+                return fetch(collectionURL)
+                    .then(r => r.json())
+            },
+            saveJSON: function (obj) {
+                return fetch(collectionURL, {
+                    body: JSON.stringify(obj),
+                    method: 'POST',
+                    headers: new Headers({
+                        'Content-Type': 'application/json'
+                    })
+                })
+                    .then(response => response.json())
+                    .then(r => this.loadPersonas())
             },
             cmbChange: function () {
                 if (this.persona === null) {
@@ -153,11 +123,13 @@
                     alert('Debe seleccionar una persona!')
                     return
                 }
-                console.log('guardar', {
-                    nombre: this.persona,
+                let p = this.personas.filter(p => p.nombre == this.persona)[0]
+                let a = p.asistencias
+                a.push({
                     fecha: this.fecha,
                     asistencia: this.asistencia
                 })
+                this.saveJSON(p)
             }
         }
     })
