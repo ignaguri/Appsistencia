@@ -1,14 +1,28 @@
 [
   {
-    "Ivana": {
-      "11-04-18": false,
-      "12-04-18": true
-    }
+    "nombre": "Ivana",
+    "asistencias": [
+      {
+        "fecha": "11-04-18",
+        "asistencia": false
+      },
+      {
+        "fecha": "12-04-18",
+        "asistencia": true
+      }
+    ]
   },
   {
-    "Pepe": {
-      "11-04-18": true,
-      "12-04-18": false
-    }
+    "nombre": "Pepe",
+    "asistencias": [
+      {
+        "fecha": "11-04-18",
+        "asistencia": true
+      },
+      {
+        "fecha": "12-04-18",
+        "asistencia": false
+      }
+    ]
   }
 ]

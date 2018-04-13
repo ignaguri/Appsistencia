@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Pulpfragio</title>
+    <title>Appsistencia</title>
     <script src="vue.js"></script>
     <link rel="stylesheet" href="bootstrap.min.css">
 </head>
@@ -11,52 +11,75 @@
         <div class="text-center">
             <h1><img src="logo.png" class="img-circle" style="height: 70px; width: 70px;margin-right:10px;">Appsistencia</h1>
         </div>
-        <hr>
+        <br>
     </div>
     <div class="row">
-        <div class="text-center">
-            <div class="form-group">
-                <label for="txt_nombre">Nombre:</label>
-                <input type="text" id="txt_nombre" v-model="input.nombre" placeholder="Nombre del elegible" @keyup.enter="agregar">
-                <button type="button" class="btn btn-default" @click="agregar">Agregar</button>
+        <div class="col-md-3"></div>
+            <div class="text-center">
+                <div class="col-md-6">
+                <div class="form-group">
+                    <label for="cmb_personas">Persona:</label>
+                    <select class="form-control" id="cmb_personas" v-model="persona" @change="cmbChange" required>
+                        <option :value="null">Seleccione una persona</option>
+                        <option v-for="p in personas" :value="p.nombre">
+                            {{ p.nombre }}
+                        </option>
+                    </select>
+                </div>
             </div>
         </div>
+        <div class="col-md-3"></div>
     </div>
     <div class="row">
-        <div class="col-md-2" v-for="e in elegibles">
-            <h3><p class="text-center">{{e}}<button type="button" class="close" aria-label="Close" @click="eliminar(e)"><span aria-hidden="true">&times;</span></button></p></h3>
-            <button type="button" class="btn btn-success btn-block" @click="presi1(e)">Presi 1</button>
-            <button type="button" class="btn btn-info btn-block" @click="presi2(e)">Presi 2</button>
-            <button type="button" class="btn btn-warning btn-block" @click="comando(e)">Comando</button>
+        <div class="col-md-3"></div>
+        <div class="text-center">
+            <div class="col-md-6">
+                <form @submit.prevent="guardar">
+                <div class="form-group">
+                    <label for="date_fecha">Fecha:</label>
+                    <input type="date" id="date_fecha" class="form-control" v-model="fecha" required>
+                    <label class="radio-inline">
+                        <input type="radio" name="radio_asistencia" id="presente" value="true" v-model="asistencia" required> Presente
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="radio_asistencia" id="ausente" value="false" v-model="asistencia" required> Ausente
+                    </label>
+                </div>
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </form>
+            </div>
         </div>
-        <hr>
+        <div class="col-md-3"></div>
     </div>
+    <!--<div class="row">-->
+        <!--<div class="col-md-2" v-for="e in elegibles">-->
+            <!--<h3><p class="text-center">{{e}}<button type="button" class="close" aria-label="Close" @click="eliminar(e)"><span aria-hidden="true">&times;</span></button></p></h3>-->
+            <!--<button type="button" class="btn btn-success btn-block" @click="presi1(e)">Presi 1</button>-->
+            <!--<button type="button" class="btn btn-info btn-block" @click="presi2(e)">Presi 2</button>-->
+            <!--<button type="button" class="btn btn-warning btn-block" @click="comando(e)">Comando</button>-->
+        <!--</div>-->
+        <!--<hr>-->
+    <!--</div>-->
     <div class="row">
         <hr>
-        <div class="col-md-12">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
             <div class="text-center">
                 <table class="table table-bordered">
                     <thead>
-                    <th class="text-center">Nombre</th>
-                    <th class="text-center">Presi 1 (2p.)</th>
-                    <th class="text-center">Presi 2 (1p.)</th>
-                    <th class="text-center">Total Presi</th>
-                    <th class="text-center">Comando</th>
-                    <th class="text-center">Total votos</th>
+                    <th class="text-center">Dia</th>
+                    <th class="text-center">Asistencia</th>
                     </thead>
                     <tbody>
-                    <tr v-for="v,k in votos">
-                        <td><strong><em>{{k}}</em></strong></td>
-                        <td>{{v['presi1']}}</td>
-                        <td>{{v['presi2']}}</td>
-                        <td><strong>{{v['presi1'] * 2 + v['presi2']}}</strong></td>
-                        <td>{{v['comando']}}</td>
-                        <td><u>{{v['presi1'] + v['presi2'] + v['comando']}}</u></td>
+                    <tr v-for="v in asistencias">
+                        <td><strong><em>{{v.fecha}}</em></strong></td>
+                        <td>{{v.asistencia? 'Presente' : 'Ausente'}}</td>
                     </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+        <div class="col-md-2"></div>
     </div>
 </div>
 
@@ -64,21 +87,21 @@
     var app = new Vue({
         el: '#app',
         data: {
-            input: {
-                nombre: null
-            },
-            votos: {},
-            elegibles: []
+            personas: [],
+            persona: null,
+            asistencias: null,
+            fecha: null,
+            asistencia: null
         },
         mounted() {
             this.loadPersonas()
         },
         methods: {
-            agregar: function (e) {
-                var pibe = this.input.nombre
+            /*agregar: function (e) {
+                let pibe = this.input.nombre
                 this.elegibles.push(pibe)
                 this.input.nombre = null
-                var vot = {
+                let vot = {
                     presi1: 0,
                     presi2: 0,
                     comando: 0
@@ -97,11 +120,12 @@
             eliminar: function (e) {
                 this.elegibles = this.elegibles.filter(function (ele) { return ele != e })
                 delete this.votos[e]
-            },
+            },*/
             loadPersonas: function () {
+                this.personas = []
                 this.loadJSON(r => {
                     r = JSON.parse(r)
-                    console.log('loadjson', Object.keys(r))
+                    this.personas = r
                 })
             },
             loadJSON: function (callback) {
@@ -115,6 +139,25 @@
                     }
                 }
                 xobj.send(null)
+            },
+            cmbChange: function () {
+                if (this.persona === null) {
+                   this.asistencias = null
+                    return
+                }
+                let asist = this.personas.filter(p => p.nombre == this.persona)
+                this.asistencias = asist[0].asistencias
+            },
+            guardar: function () {
+                if (!this.persona) {
+                    alert('Debe seleccionar una persona!')
+                    return
+                }
+                console.log('guardar', {
+                    nombre: this.persona,
+                    fecha: this.fecha,
+                    asistencia: this.asistencia
+                })
             }
         }
     })
