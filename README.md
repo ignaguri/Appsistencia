@@ -11,8 +11,8 @@ Sólo abrir ```index.html```
 Cambiar la URL de la BD de mLab y la API Key en ```js/config.js```
 
 #### Dependencies/Styling
-- [VueJS] [vue]
-- [Bootstrap v4.1] [bst]
+- [VueJS][vue]
+- [Bootstrap v4.1][bst]
 - [jQuery]
 
  [mlab]: <https://mlab.com/>
