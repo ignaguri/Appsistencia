@@ -69,7 +69,7 @@
                     </thead>
                     <tbody>
                     <tr v-for="v in asistencias">
-                        <td><strong><em>{{new Date(v.fecha).toDateString()}}</em></strong></td>
+                        <td><strong><em>{{v.fecha}}</em></strong></td>
                         <td v-if="v.asistencia" class="table-success">Presente</td>
                         <td v-else class="table-danger">Ausente</td>
                     </tr>
