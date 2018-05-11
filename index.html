@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Appsistencia</title>
     <script src="./js/vue.js"></script>
@@ -7,150 +8,175 @@
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
+
 <body>
-<div id="app" class="container">
-    <div class="row position-sticky">
-        <div class="col">
-            <h1 class="display-4 text-center">
-                <img src="./css/logo.png" class="img-circle" style="height: 70px; width: 70px;margin-right:10px;">
-                Appsistencia
-            </h1>
-        </div>
-    </div>
-    <hr>
-    <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <label for="cmb_personas">Persona:</label>
-                <select class="form-control" id="cmb_personas" v-model="persona" @change="cmbChange" required>
-                    <option :value="null">Seleccione una persona</option>
-                    <option v-for="p in personas" :value="p.nombre">
-                        {{ p.nombre }}
-                    </option>
-                </select>
+    <div id="app" class="container">
+        <div class="row position-sticky">
+            <div class="col">
+                <h1 class="display-4 text-center">
+                    <img src="./css/logo.png" class="img-circle" style="height: 70px; width: 70px;margin-right:10px;"> Appsistencia
+                </h1>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <form @submit.prevent="guardar">
+        <hr>
+        <div class="row">
+            <div class="col">
                 <div class="form-group">
-                    <label for="date_fecha">Fecha:</label>
-                    <input type="date" id="date_fecha" class="form-control" v-model="fecha" required>
-                    <br>
-                    <div class="text-center">
-                        <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                            <label class="btn btn-danger" @click="asistencia = false">
-                                <input type="radio" name="radio_asistencia" id="presente" :value="false" v-model="asistencia"
-                                       required> Ausente
-                            </label>
-                            <label class="btn btn-success" @click="asistencia = true">
-                                <input type="radio" name="radio_asistencia" id="ausente" :value="true" v-model="asistencia"
-                                       required> Presente
-                            </label>
+                    <label for="cmb_personas">Persona:</label>
+                    <select class="form-control" id="cmb_personas" v-model="persona" @change="cmbChange" required>
+                        <option :value="null">Seleccione una persona</option>
+                        <option v-for="p in personas" :value="p.nombre">
+                            {{ p.nombre }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <form @submit.prevent="guardar">
+                    <div class="form-group">
+                        <label for="date_fecha">Fecha:</label>
+                        <input type="date" id="date_fecha" class="form-control" v-model="fecha" required>
+                        <br>
+                        <div class="text-center">
+                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                <label class="btn btn-danger" @click="asistencia = false">
+                                    <input type="radio" name="radio_asistencia" id="presente" :value="false" v-model="asistencia" required> Ausente
+                                </label>
+                                <label class="btn btn-success" @click="asistencia = true">
+                                    <input type="radio" name="radio_asistencia" id="ausente" :value="true" v-model="asistencia" required> Presente
+                                </label>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-info">Guardar</button>
                         </div>
                     </div>
-                    <br>
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-info">Guardar</button>
-                    </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-    </div>
-    <hr>
-    <div class="row">
-        <div class="col">
-            <div class="text-center">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                    <th class="text-center">Dia</th>
-                    <th class="text-center">Asistencia</th>
-                    </thead>
-                    <tbody>
-                    <tr v-for="v in asistencias">
-                        <td><strong><em>{{v.fecha}}</em></strong></td>
-                        <td v-if="v.asistencia" class="table-success">Presente</td>
-                        <td v-else class="table-danger">Ausente</td>
-                    </tr>
-                    </tbody>
-                </table>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <div class="text-center">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <th class="text-center">Dia</th>
+                            <th class="text-center">Asistencia</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="v in asistencias">
+                                <td>
+                                    <strong>
+                                        <em>{{v.fecha}}</em>
+                                    </strong>
+                                </td>
+                                <td v-if="v.asistencia" class="table-success">Presente</td>
+                                <td v-else class="table-danger">Ausente</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script src="./js/jquery-3.3.1.min.js"></script>
-<script src="./js/bootstrap.min.js"></script>
-<script src="./js/config.js"></script>
-<script>
-    var app = new Vue({
-        el: '#app',
-        data: {
-            personas: [],
-            persona: null,
-            asistencias: null,
-            fecha: null,
-            asistencia: null
-        },
-        mounted() {
-            this.loadPersonas()
-        },
-        methods: {
-            loadPersonas: function () {
-                this.loadJSON()
-                    .then(r => {
-                        this.personas = r
-                    })
+    <script src="./js/jquery-3.3.1.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="./js/config.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                personas: [],
+                persona: null,
+                asistencias: null,
+                fecha: null,
+                asistencia: null
             },
-            loadJSON: function () {
-                return fetch(collectionURL)
-                    .then(r => r.json())
+            mounted() {
+                this.loadPersonas()
             },
-            saveJSON: function (obj) {
-                return fetch(collectionURL, {
-                    body: JSON.stringify(obj),
-                    method: 'POST',
-                    headers: new Headers({
-                        'Content-Type': 'application/json'
-                    })
-                })
-                    .then(response => response.json())
-                    .then(r => {
-                        this.reset()
-                        this.loadPersonas()
-                    })
-                    .catch(err => {
-                        console.error(err)
-                        this.loadPersonas()
-                    })
-            },
-            cmbChange: function () {
-                if (this.persona === null) {
-                    this.asistencias = null
-                    return
+            watch: {
+                persona: function () {
+                    this.ordenarAsistencias()
                 }
-                let asist = this.personas.filter(p => p.nombre == this.persona)
-                this.asistencias = asist[0].asistencias
             },
-            guardar: function () {
-                if (!this.persona) {
-                    alert('Debe seleccionar una persona!')
-                    return
+            methods: {
+                loadPersonas: function () {
+                    this.loadJSON()
+                        .then(r => {
+                            console.log('loadPersonas', r)
+                            this.personas = r
+                        })
+                },
+                loadJSON: function () {
+                    return fetch(collectionURL)
+                        .then(r => r.json())
+                },
+                saveJSON: function (obj) {
+                    return fetch(collectionURL, {
+                        body: JSON.stringify(obj),
+                        method: 'POST',
+                        headers: new Headers({
+                            'Content-Type': 'application/json'
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(r => {
+                            this.reset()
+                            this.loadPersonas()
+                        })
+                        .catch(err => {
+                            console.error(err)
+                            this.loadPersonas()
+                        })
+                },
+                cmbChange: function () {
+                    if (this.persona === null) {
+                        this.asistencias = null
+                        return
+                    }
+                    let asist = this.personas.filter(p => p.nombre == this.persona)
+                    this.asistencias = asist[0].asistencias
+                },
+                guardar: function () {
+                    if (!this.persona) {
+                        alert('Debe seleccionar una persona!')
+                        return
+                    }
+                    let p = this.personas.filter(p => p.nombre == this.persona)[0]
+                    let a = p.asistencias
+                    a.push({
+                        fecha: this.fecha,
+                        asistencia: this.asistencia
+                    })
+                    this.saveJSON(p)
+                },
+                reset: function () {
+                    this.fecha = null
+                    this.asistencia = null
+                },
+                ordenarAsistencias: function () {
+                    if (this.persona !== null) {
+                        this.asistencias.sort(((a, b) => {
+                            const fechaA = a.fecha
+                            const fechaB = b.fecha
+                            // inverted for descending order
+                            if (fechaA > fechaB) {
+                                return -1
+                            }
+                            if (fechaA < fechaB) {
+                                return 1
+                            }
+                            return 0
+                        }))
+                    }
                 }
-                let p = this.personas.filter(p => p.nombre == this.persona)[0]
-                let a = p.asistencias
-                a.push({
-                    fecha: this.fecha,
-                    asistencia: this.asistencia
-                })
-                this.saveJSON(p)
-            },
-            reset: function () {
-                this.fecha = null
-                this.asistencia = null
             }
-        }
-    })
-</script>
+        })
+    </script>
 </body>
+
 </html>
